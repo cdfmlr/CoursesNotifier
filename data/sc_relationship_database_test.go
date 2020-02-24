@@ -32,7 +32,7 @@ func TestStudentCourseRelationshipDatabase_Delete(t *testing.T) {
 		dataSourceName string
 	}
 	type args struct {
-		sid string
+		r models.Relationship
 	}
 	tests := []struct {
 		name             string
@@ -48,7 +48,7 @@ func TestStudentCourseRelationshipDatabase_Delete(t *testing.T) {
 			rdb := &StudentCourseRelationshipDatabase{
 				dataSourceName: tt.fields.dataSourceName,
 			}
-			gotRowsAffected, err := rdb.Delete(tt.args.sid)
+			gotRowsAffected, err := rdb.Delete(tt.args.r)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -147,8 +147,8 @@ func TestStudentCourseRelationshipDatabase_Insert(t *testing.T) {
 			name: "insert Foo Again",
 			fields:fields{dataSourceName:"c:000123@/test?charset=utf8"},
 			args:args{relationship:*models.NewRelationship("201810000999", "ee7d85e6d90a1981141e7f50f72d9a63")},
-			wantRowsAffected: 1,
-			wantErr: false,
+			wantRowsAffected: 0,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -197,33 +197,6 @@ func TestStudentCourseRelationshipDatabase_Update(t *testing.T) {
 			}
 			if gotRowsAffected != tt.wantRowsAffected {
 				t.Errorf("Update() gotRowsAffected = %v, want %v", gotRowsAffected, tt.wantRowsAffected)
-			}
-		})
-	}
-}
-
-func Test_deleteRelationship(t *testing.T) {
-	type args struct {
-		db  *sql.DB
-		sid string
-	}
-	tests := []struct {
-		name             string
-		args             args
-		wantRowsAffected int64
-		wantErr          bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotRowsAffected, err := deleteRelationship(tt.args.db, tt.args.sid)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("deleteRelationship() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if gotRowsAffected != tt.wantRowsAffected {
-				t.Errorf("deleteRelationship() gotRowsAffected = %v, want %v", gotRowsAffected, tt.wantRowsAffected)
 			}
 		})
 	}

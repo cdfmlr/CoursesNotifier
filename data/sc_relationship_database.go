@@ -20,7 +20,7 @@ func NewStudentCourseRelationshipDatabase(dataSourceName string) *StudentCourseR
 
 // Insert 连接数据库，将给定的一条 Relationship 插入数据库。
 // 给定的 Relationship 必须指定 sid, cid；
-// 插入数据不会检测是否重复！
+// 插入重复的关系（相同sid-cid组合）会返回不为 nil 的 error！
 // 返回 Rows Affected
 func (rdb *StudentCourseRelationshipDatabase) Insert(relationship models.Relationship) (rowsAffected int64, err error) {
 	db, err := sql.Open("mysql", rdb.dataSourceName)
@@ -87,7 +87,7 @@ func (rdb *StudentCourseRelationshipDatabase) Delete(relationship models.Relatio
 
 // insertRelationship 负责将给定的一条 Relationship 插入给定数据库连接。
 // 给定的 Relationship 必须指定 sid, cid；
-// 插入数据不会检测是否重复！
+// 插入重复的关系（相同sid-cid组合）会返回不为 nil 的 error！
 // 返回 Rows Affected
 func insertRelationship(db *sql.DB, relationship models.Relationship) (rowsAffected int64, err error) {
 	stmt, err := db.Prepare("INSERT INTO coursetaking SET sid=?,cid=?")
