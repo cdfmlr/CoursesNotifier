@@ -20,21 +20,22 @@ import (
     }
 */
 type Course struct {
-	Cid      string // 该系统内部课程识别码，Name,Teacher,Location,Begin,End,Week 的 md5 和
-	Name     string // 课程名称
-	Teacher  string // 任课老师
-	Location string // 上课地点
-	Begin    string // 上课时间
-	End      string // 下课时间
-	Week     string // 开课周次
+	Cid      string // 该系统内部课程识别码，Name,Teacher,Location,Begin,End,Week,When 的 md5 和
+	Name     string // 课程名称 <- kcmc
+	Teacher  string // 任课老师 <- jsxm
+	Location string // 上课地点 <- jsmc
+	Begin    string // 上课时间 <- kssj
+	End      string // 下课时间 <- jssj
+	Week     string // 开课周次 <- kkzc
+	When     string // 上课节次 <- kcsj
 }
 
-// NewCourse 返回给定 name,teacher,location,begin,end,week 所决定的 Course，cid 会在此完成计算
-func NewCourse(name string, teacher string, location string, begin string, end string, week string) *Course {
-	course := &Course{Name: name, Teacher: teacher, Location: location, Begin: begin, End: end, Week: week}
+// NewCourse 返回给定 Name,Teacher,Location,Begin,End,Week,When 所决定的 Course，cid 会在此完成计算
+func NewCourse(name string, teacher string, location string, begin string, end string, week string, when string) *Course {
+	course := &Course{Name: name, Teacher: teacher, Location: location, Begin: begin, End: end, Week: week, When: when}
 
-	// 计算 cid，Name,Teacher,Location,Begin,End,Week 的 md5 和
-	sl := []string{name, teacher, location, begin, end, week}
+	// 计算 cid，Name,Teacher,Location,Begin,End,Week,When 的 md5 和
+	sl := []string{name, teacher, location, begin, end, week, when}
 	data := []byte(strings.Join(sl, ""))
 	cid := fmt.Sprintf("%x", md5.Sum(data))
 	course.Cid = cid
@@ -43,6 +44,6 @@ func NewCourse(name string, teacher string, location string, begin string, end s
 }
 
 func testNewCourse() { // TODO: delete this func
-	c := NewCourse("上帝学", "耶稣", "巴黎圣母院2楼小室", "08:00", "09:50", "1-12")
+	c := NewCourse("The Art of Bullshit", "Foo", "Foo Bar", "08:00", "09:50", "1-12", "10506")
 	fmt.Println(c, c.Cid)
 }
