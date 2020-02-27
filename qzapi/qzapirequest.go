@@ -27,6 +27,8 @@ func qzApiGet(school string, token string, res interface{}, a map[string]string)
 	Url.RawQuery = params.Encode()
 	urlPath := Url.String()
 
+	// fmt.Println(urlPath)
+
 	// Make Request and Header
 	client := &http.Client{}
 
@@ -49,10 +51,9 @@ func qzApiGet(school string, token string, res interface{}, a map[string]string)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
-	// fmt.Println(string(body))
 	err = json.Unmarshal(body, res)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, "\nresp.body:\n" , string(body))
 		return err
 	}
 	return nil

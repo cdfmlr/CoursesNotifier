@@ -12,7 +12,7 @@ type AuthUserRespBody struct {
 }
 
 /*
-authUser 登录帐号。
+AuthUser 登录帐号。
 
 在调用其它接口前，需要使用本接口获取token。并在调用其它接口的请求的header中添加本接口获得的token参数。
 
@@ -20,7 +20,7 @@ GET http://jwxt.xxxx.edu.cn/app.do?method=authUser&xh={$学号}&pwd={$密码}
 
 Req:
 	{
-		"method":'authUser',  //必填
+		"method":'AuthUser',  //必填
 		"xh":'登陆教务系统使用的学号',  //必填
 		"pwd":'登陆教务系统需要的密码'  //必填
 	}
@@ -35,7 +35,7 @@ Resp:
 		"msg":"登录成功" //返回消息
 	}
 */
-func authUser(school, xh, pwd string) (*AuthUserRespBody, error) {
+func AuthUser(school, xh, pwd string) (*AuthUserRespBody, error) {
 	authUserRespBody := &AuthUserRespBody{}
 	q := map[string]string{
 		"method": "authUser",

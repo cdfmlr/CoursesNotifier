@@ -1,5 +1,5 @@
 package qzapi
 
 const (
-	School = "ncepu"
+	SchoolNcepu = "ncepu"
 )

@@ -21,8 +21,8 @@ func Test_getKbcxAzc(t *testing.T) {
 		{
 			name: "get kbcx at zc",
 			args: args{
-				school: School,
-				token:  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODI2ODI0NzQsImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.yLIdapycLSamAVHGrm8AvZSnGS-rWR4Kjji-h2ZU_Mg",
+				school: SchoolNcepu,
+				token:  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODI2ODcyNjcsImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.vm2jxI9ilvrmKMHnXd2dkGB2ERhfea4mNspE1ZK1VM8",
 				xh:     "201810000431",
 				xnxqid: "2019-2020-2",
 				zc:     "2",
@@ -31,14 +31,14 @@ func Test_getKbcxAzc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getKbcxAzc(tt.args.school, tt.args.token, tt.args.xh, tt.args.xnxqid, tt.args.zc)
+			got, err := GetKbcxAzc(tt.args.school, tt.args.token, tt.args.xh, tt.args.xnxqid, tt.args.zc)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getKbcxAzc() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetKbcxAzc() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			t.Log(got)
 			//if !reflect.DeepEqual(got, tt.want) {
-			//	t.Errorf("getKbcxAzc() got = %v, want %v", got, tt.want)
+			//	t.Errorf("GetKbcxAzc() got = %v, want %v", got, tt.want)
 			//}
 		})
 	}

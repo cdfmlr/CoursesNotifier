@@ -4,24 +4,22 @@ import (
 	"log"
 )
 
-
-
 type GetCurrentTimeRespBody struct {
-	Zc    int64  `json:"zc"`
+	Zc    int    `json:"zc"`
 	STime string `json:"s_time"`
 	ETime string `json:"e_time"`
 	Xnxqh string `json:"xnxqh"`
 }
 
 /*
-getCurrentTime 获取所提交的日期的时间、周次、学年等信息。
+FetchCurrentTime 获取所提交的日期的时间、周次、学年等信息。
 
 GET http://jwxt.xxxx.edu.cn/app.do?method=getCurrentTime&currDate={$查询日期}
 
 Req:
 	request.header{token:'运行身份验证authUser时获取到的token，有过期机制'},
 	request.data{
-		'method':'getCurrentTime',  //必填
+		'method':'FetchCurrentTime',  //必填
 		'currDate':  //格式为"YYYY-MM-DD"，必填，留空调用成功，但返回值均为null
 	}
 
@@ -33,7 +31,7 @@ Resp:
 		"xnxqh":"2018-2019-1" //学年学期名称
 	}
 */
-func getCurrentTime(school, token, currDate string) (*GetCurrentTimeRespBody, error) {
+func GetCurrentTime(school, token, currDate string) (*GetCurrentTimeRespBody, error) {
 	resp := &GetCurrentTimeRespBody{}
 	q := map[string]string{
 		"method":   "getCurrentTime",
