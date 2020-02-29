@@ -1,4 +1,4 @@
-package accessToken
+package wxAccessToken
 
 import (
 	"log"
