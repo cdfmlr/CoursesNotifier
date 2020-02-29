@@ -3,6 +3,7 @@ package data
 import (
 	"database/sql"
 	"example.com/CoursesNotifier/models"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
@@ -54,6 +55,31 @@ func (sdb *CourseDatabase) GetCourse(cid string) (*models.Course, error) {
 	}
 	defer db.Close()
 	return getCourse(db, cid)
+}
+
+// GetCoursesOnTime 返回指定返回指定星期几、几点开始的所有课程（不分周次）
+// e.g.
+// 		sbd.GetCoursesOnTime(2, 3, "08:00")
+// 表示 星期 3 的 08:00 开始的课程
+func (sdb *CourseDatabase) GetCoursesOnTime(day int, begin string) ([]models.Course, error) {
+	db, err := sql.Open("mysql", sdb.dataSourceName)
+	if err != nil {
+		log.Println(err)
+		return []models.Course{}, err
+	}
+	defer db.Close()
+	return getCoursesOnTime(db, day, begin)
+}
+
+// GetCoursesBeginTime 获取所有可能的上课开始时间
+func (sdb *CourseDatabase) GetCoursesBeginTime() ([]string, error) {
+	db, err := sql.Open("mysql", sdb.dataSourceName)
+	if err != nil {
+		log.Println(err)
+		return []string{}, err
+	}
+	defer db.Close()
+	return getCoursesBeginTime(db)
 }
 
 // Update 用来在数据库中将 cid 标识的记录更新为传入的 course
@@ -149,6 +175,49 @@ func getCourse(db *sql.DB, cid string) (*models.Course, error) {
 		break
 	}
 	return &course, nil
+}
+
+// getCourseOnTime 返回指定星期几、几点的所有课程（不分周次）
+// e.g.
+// 		GetCoursesOnTime(db, 2, 3, "08:00")
+// 表示 星期 3 的 08:00 开始的课程
+func getCoursesOnTime(db *sql.DB, day int, begin string) ([]models.Course, error) {
+	var courses []models.Course
+	timeLike := fmt.Sprintf("%d%%", day)
+	rows, err := db.Query("SELECT cid,name,teacher,location,begin,end,week,time FROM course WHERE begin=? AND time LIKE ?", begin, timeLike)
+	if err != nil {
+		log.Println(err)
+		return courses, err
+	}
+	for rows.Next() {
+		var c models.Course
+		err = rows.Scan(&c.Cid, &c.Name, &c.Teacher, &c.Location, &c.Begin, &c.End, &c.Week, &c.When)
+		if err != nil {
+			log.Println(err)
+			return courses, err
+		}
+		courses = append(courses, c)
+	}
+
+	return courses, nil
+}
+
+// getCoursesBeginTime 获取所有可能的上课开始时间
+func getCoursesBeginTime(db *sql.DB) ([]string, error) {
+	var coursesBeginTimes []string
+	rows, err := db.Query("SELECT DISTINCT begin FROM course")
+
+	for rows.Next() {
+		var cBTime string
+		err = rows.Scan(&cBTime)
+		coursesBeginTimes = append(coursesBeginTimes, cBTime)
+	}
+
+	if err != nil {
+		log.Println(err)
+		return coursesBeginTimes, err
+	}
+	return coursesBeginTimes, nil
 }
 
 // updateCourse 用来在给定数据库连接中将 cid 标识的记录更新为传入的 course

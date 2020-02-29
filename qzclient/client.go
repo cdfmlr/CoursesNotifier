@@ -130,6 +130,7 @@ func (c *Client) saveStudent(databaseSource string) (rowsAffected int64) {
 func (c *Client) saveCourses(databaseSource string) (rowsAffected int64) {
 	var totalAffected int64
 
+	// TODO: 在 database 里实现一个 insertMany，省得这里麻烦，且重复连接数据库
 	cdb := data.NewCourseDatabase(databaseSource)
 	for _, v := range c.Courses {
 		affected, err := cdb.Insert(v)
@@ -149,6 +150,7 @@ func (c *Client) saveSCRelationships(databaseSource string) (rowsAffected int64)
 		relations = append(relations, *models.NewRelationship(c.Student.Sid, k))
 	}
 
+	// TODO: 在 database 里实现一个 insertMany，省得这里麻烦，且重复连接数据库
 	rdb := data.NewStudentCourseRelationshipDatabase(databaseSource)
 	for _, r := range relations {
 		affected, err := rdb.Insert(r)

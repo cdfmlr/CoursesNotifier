@@ -45,14 +45,26 @@ func (rdb *StudentCourseRelationshipDatabase) GetAllRelationships() ([]models.Re
 
 // GetRelationshipsOfStudent 返回库中与给定 sid 相关的 Relationship 记录
 // 若指定关系记录不存在将返回 (&models.Relationship{}, nil)
-func (rdb *StudentCourseRelationshipDatabase) GetRelationshipsOfStudent(sid string) (*models.Relationship, error) {
+func (rdb *StudentCourseRelationshipDatabase) GetRelationshipsOfStudent(sid string) ([]models.Relationship, error) {
 	db, err := sql.Open("mysql", rdb.dataSourceName)
 	if err != nil {
 		log.Println(err)
-		return &models.Relationship{}, err
+		return []models.Relationship{}, err
 	}
 	defer db.Close()
-	return getRelationshipOfStudent(db, sid)
+	return getRelationshipsOfStudent(db, sid)
+}
+
+// GetRelationshipsOfCourse 返回库中与给定 cid 相关的 Relationship 记录
+// 若指定关系记录不存在将返回 (&models.Relationship{}, nil)
+func (rdb *StudentCourseRelationshipDatabase) GetRelationshipsOfCourse(cid string) ([]models.Relationship, error) {
+	db, err := sql.Open("mysql", rdb.dataSourceName)
+	if err != nil {
+		log.Println(err)
+		return []models.Relationship{}, err
+	}
+	defer db.Close()
+	return getRelationshipsOfCourse(db, cid)
 }
 
 // Update 用来在数据库中将 sid 标识的记录更新为传入的 relationship
@@ -128,26 +140,46 @@ func getAllRelationships(db *sql.DB) ([]models.Relationship, error) {
 	return relationships, nil
 }
 
-// getRelationshipOfStudent 返回给定数据库连接中与给定 sid 相关的 Relationship 记录
+// getRelationshipsOfStudent 返回给定数据库连接中与给定 sid 相关的 Relationship 记录
 // 若指定关系记录不存在将返回 (&models.Relationship{}, nil)
-func getRelationshipOfStudent(db *sql.DB, sid string) (*models.Relationship, error) {
-	var relationship models.Relationship
+func getRelationshipsOfStudent(db *sql.DB, sid string) ([]models.Relationship, error) {
+	var relationships []models.Relationship
 	rows, err := db.Query("SELECT sid,cid FROM coursetaking WHERE sid=?", sid)
 	if err != nil {
 		log.Println(err)
-		return &relationship, err
+		return relationships, err
 	}
 	for rows.Next() {
 		var r models.Relationship
 		err = rows.Scan(&r.Sid, &r.Cid)
 		if err != nil {
 			log.Println(err)
-			return &relationship, err
+			return relationships, err
 		}
-		relationship = r
-		break
+		relationships = append(relationships, r)
 	}
-	return &relationship, nil
+	return relationships, nil
+}
+
+// getRelationshipsOfCourse 返回给定数据库连接中与给定 cid 相关的 Relationship 记录
+// 若指定关系记录不存在将返回 (&models.Relationship{}, nil)
+func getRelationshipsOfCourse(db *sql.DB, cid string) ([]models.Relationship, error) {
+	var relationships []models.Relationship
+	rows, err := db.Query("SELECT sid,cid FROM coursetaking WHERE cid=?", cid)
+	if err != nil {
+		log.Println(err)
+		return relationships, err
+	}
+	for rows.Next() {
+		var r models.Relationship
+		err = rows.Scan(&r.Sid, &r.Cid)
+		if err != nil {
+			log.Println(err)
+			return relationships, err
+		}
+		relationships = append(relationships, r)
+	}
+	return relationships, nil
 }
 
 // updateRelationship 用来在给定数据库连接中将 sid 标识的记录更新为传入的 relationship

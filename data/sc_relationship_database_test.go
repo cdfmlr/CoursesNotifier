@@ -217,13 +217,13 @@ func Test_getRelationship(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getRelationshipOfStudent(tt.args.db, tt.args.sid)
+			got, err := getRelationshipsOfStudent(tt.args.db, tt.args.sid)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getRelationshipOfStudent() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getRelationshipsOfStudent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getRelationshipOfStudent() got = %v, want %v", got, tt.want)
+				t.Errorf("getRelationshipsOfStudent() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -118,14 +118,14 @@ func TestCourseDatabase_Insert(t *testing.T) {
 		{
 			name: "insert Foo",
 			fields:fields{dataSourceName:"c:000123@/test?charset=utf8"},
-			args:args{course:*models.NewCourse("豆腐豆腐", "市人大", "法国", "12:00", "14:00", "1-18")},
+			args:args{course:*models.NewCourse("豆腐豆腐", "市人大", "法国", "12:00", "14:00", "1-18", "10102")},
 			wantRowsAffected: 1,
 			wantErr: false,
 		},
 		{
 			name: "insert Foo Again",
 			fields:fields{dataSourceName:"c:000123@/test?charset=utf8"},
-			args:args{course:*models.NewCourse("豆腐豆腐", "市人大", "法国", "12:00", "14:00", "1-18")},
+			args:args{course:*models.NewCourse("豆腐豆腐", "市人大", "法国", "12:00", "14:00", "1-18", "10102")},
 			wantRowsAffected: 0,
 			wantErr: true,
 		},
@@ -181,3 +181,75 @@ func TestCourseDatabase_Update(t *testing.T) {
 	}
 }
 
+func TestCourseDatabase_GetCourseOnTime(t *testing.T) {
+	type fields struct {
+		dataSourceName string
+	}
+	type args struct {
+		week  int
+		day   int
+		begin string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []models.Course
+		wantErr bool
+	}{
+		{
+			name:    "TestCourseDatabase_GetCourseOnTime",
+			fields:  fields{dataSourceName: "c:000123@/test?charset=utf8"},
+			args:    args{
+				week:  2,
+				day:   4,
+				begin: "08:00",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sdb := &CourseDatabase{
+				dataSourceName: tt.fields.dataSourceName,
+			}
+			got, err := sdb.GetCoursesOnTime(tt.args.day, tt.args.begin)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetCoursesOnTime() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			t.Log(got)
+		})
+	}
+}
+
+func TestCourseDatabase_GetCoursesBeginTime(t *testing.T) {
+	type fields struct {
+		dataSourceName string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    []string
+		wantErr bool
+	}{
+		{
+			name:    "GetCoursesBeginTime",
+			fields:  fields{"c:000123@/test?charset=utf8"},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sdb := &CourseDatabase{
+				dataSourceName: tt.fields.dataSourceName,
+			}
+			got, err := sdb.GetCoursesBeginTime()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetCoursesBeginTime() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			t.Log(got)
+		})
+	}
+}
