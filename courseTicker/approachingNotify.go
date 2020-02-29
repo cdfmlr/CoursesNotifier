@@ -19,24 +19,29 @@ const secondToWeek = 60 * 60 * 24 * 7
 // 具体来说，该函数从数据库 databaseSource 中，
 // 找出 minuteBeforeCourseToNotify 分钟内要开始的课，
 // 以及上这些课的学生，调用 notifiers 进行通知。
-func NotifyApproachingCourses(databaseSource string, minuteBeforeCourseToNotify float64, notifiers... Notifier) {
+func (ct *CoursesTicker) NotifyApproachingCourses() {
 	// 今天星期几
-	currentWeek := getCurrentWeek(databaseSource)
+	currentWeek := getCurrentWeek(ct.databaseSource)
 	// 今天第几周
 	todayQzWeekday := qzapi.TimeWeekToQzWeekday(time.Now().Weekday())
 
 	// 最近一个可能上课的时间
-	nearCourseTime := getNearestBeginTime(databaseSource)
+	nearCourseTime := getNearestBeginTime(ct.databaseSource)
 	nearCourseTimeStr := nearCourseTime.Format("15:04")
 
 	// 现在离上课还早着呢，就地返回，别去烦人家了
-	if nearCourseTime.Sub(time.Now()).Minutes() > minuteBeforeCourseToNotify {
-		log.Printf("Don't Notify: nearCourseTime(%s) - now(%s) > %v Minutes; \n", nearCourseTime, time.Now(), minuteBeforeCourseToNotify)
+	if nearCourseTime.Sub(time.Now()).Minutes() > ct.minuteBeforeCourseToNotify {
+		log.Printf(
+			"Don't Notify: nearCourseTime(%s) - now(%s) > %v Minutes; \n",
+			nearCourseTime,
+			time.Now(),
+			ct.minuteBeforeCourseToNotify,
+		)
 		return
 	}
 
 	// 这学期星期几、几点开始上的所有课
-	cdb := data.NewCourseDatabase(databaseSource)
+	cdb := data.NewCourseDatabase(ct.databaseSource)
 	coursesApproaching, _ := cdb.GetCoursesOnTime(int(todayQzWeekday), nearCourseTimeStr)
 
 	// 细化到*本周*星期几、几点开始上的课
@@ -48,13 +53,13 @@ func NotifyApproachingCourses(databaseSource string, minuteBeforeCourseToNotify 
 	}
 
 	// 找上这些课的学生，通知ta们要开始上课了
-	rdb := data.NewStudentCourseRelationshipDatabase(databaseSource)
-	sdb := data.NewStudentDatabase(databaseSource)
+	rdb := data.NewStudentCourseRelationshipDatabase(ct.databaseSource)
+	sdb := data.NewStudentDatabase(ct.databaseSource)
 	for _, c := range coursesApproachingInWeek {
 		relations, _ := rdb.GetRelationshipsOfCourse(c.Cid)
 		for _, r := range relations {
 			s, _ := sdb.GetStudent(r.Sid)
-			for _, n := range notifiers {
+			for _, n := range ct.notifiers {
 				n.Notify(s, &c)
 			}
 		}
