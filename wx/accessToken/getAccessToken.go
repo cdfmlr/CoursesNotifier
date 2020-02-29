@@ -1,4 +1,4 @@
-package accessTokenHolder
+package accessToken
 
 import (
 	"encoding/json"

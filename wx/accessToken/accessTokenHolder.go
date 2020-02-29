@@ -1,4 +1,4 @@
-package accessTokenHolder
+package accessToken
 
 import (
 	"fmt"
@@ -15,13 +15,20 @@ import (
 //
 // 更多 access_token 说明详见：https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
 
-type AccessTokenHolder struct {
+type Holder struct {
+	appID string
+	appSecret string
+
 	accessToken string
 	createTime  int64
 	expiresIn   int64
 }
 
-func (h *AccessTokenHolder) isFresh() bool {
+func NewHolder(appID string, appSecret string) *Holder {
+	return &Holder{appID: appID, appSecret: appSecret}
+}
+
+func (h *Holder) isFresh() bool {
 	if h.accessToken == "" {
 		return false
 	}
@@ -29,28 +36,28 @@ func (h *AccessTokenHolder) isFresh() bool {
 	return elapsed < h.expiresIn
 }
 
-func (h *AccessTokenHolder) refresh(appID string, appSecret string, current int, maxRetry int) {
+func (h *Holder) refresh(current int, maxRetry int) {
 	if current > maxRetry {
 		log.Panic(fmt.Sprintf("Cannot fetch access_token after %d tries.", maxRetry))
 		// TODO: Recover from this panic
 	}
 	log.Println("Try to get access token...")
-	data, err := getAccessToken(appID, appSecret)
+	data, err := getAccessToken(h.appID, h.appSecret)
 	if err != nil {
 		log.Println(err)
 	}
 	if data.AccessToken == "" {
 		log.Println("Failed to Get AccessToken, try again.")
-		h.refresh(appID, appSecret, current+1, maxRetry)
+		h.refresh(current+1, maxRetry)
 	}
 	h.accessToken = data.AccessToken
 	h.createTime = time.Now().Unix()
 	h.expiresIn = data.ExpiresIn
 }
 
-func (h *AccessTokenHolder) Get(appID string, appSecret string) string {
+func (h *Holder) Get() string {
 	if !h.isFresh() {
-		h.refresh(appID, appSecret, 0, 5)
+		h.refresh(0, 5)
 	}
 	return h.accessToken
 }
