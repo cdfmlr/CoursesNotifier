@@ -64,7 +64,7 @@ func (s *CoursesSubscribeSession) Verify() string {
 	s.GenerateVerification()
 
 	return fmt.Sprintf(
-		"(0x064) 根据您提供的信息，我们查询到您是 %s 的 %s。您本学期的课程有: %s\n如果信息正确，且确认订阅课程提醒服务，请回复数字验证码：【%s】",
+		"(0x064) 根据您提供的信息，我们查询到您是 %s 的 %s。您本学期的课程有: %s\n如果信息正确，且确认订阅课程提醒服务，请回复数字验证码：【%s】(五分钟内有效)",
 		school,
 		realName,
 		coursesStr,

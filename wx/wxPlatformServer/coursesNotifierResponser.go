@@ -10,6 +10,12 @@ type CourseNotifierResponser struct {
 	databaseSource string
 }
 
+func NewCourseNotifierResponser(databaseSource string) *CourseNotifierResponser {
+	c := &CourseNotifierResponser{databaseSource: databaseSource}
+	c.sessionMap = make(map[string]VerifySerSession)
+	return c
+}
+
 // 订阅课表首先是粗略判断用户输入是否合法，
 // 然后尝试拿用户的输入登录强智系统，
 // 如果登录成功，则返回真实姓名、系、一个验证码给用户，问他正不正确、要不要办
@@ -29,7 +35,9 @@ func (c CourseNotifierResponser) Do(reqUser string, reqContent string) (respCont
 		return c.sessionMap[reqUser].Verify()
 	case isReqVerification(reqContent):
 		if c.sessionMap[reqUser] != nil {
-			return c.sessionMap[reqUser].Continue(reqContent)
+			ret := c.sessionMap[reqUser].Continue(reqContent)
+			c.sessionMap[reqUser] = nil
+			return ret
 		} else {
 			return "😯你发这个干嘛？"
 		}

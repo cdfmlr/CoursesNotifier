@@ -26,7 +26,7 @@ func (s *CoursesUnsubscribeSession) Verify() string {
 	s.GenerateVerification()
 
 	return fmt.Sprintf(
-		"(0x064) 您确认要退订课程提醒服务嘛T_T 若您意已决，请回复数字验证码：【%s】",
+		"(0x064) 您确认要退订课程提醒服务嘛T_T 若您意已决，请回复数字验证码：【%s】(五分钟内有效)",
 		s.verification,
 	)
 }

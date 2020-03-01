@@ -19,6 +19,10 @@ type WxPlatformServer struct {
 	databaseSource string
 }
 
+func New(token string, responser Responser, databaseSource string) *WxPlatformServer {
+	return &WxPlatformServer{token: token, responser: responser, databaseSource: databaseSource}
+}
+
 func (s *WxPlatformServer) Handle(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if !s.validateWxRequest(w, r) {
