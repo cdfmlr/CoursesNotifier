@@ -93,6 +93,19 @@ func (rdb *StudentCourseRelationshipDatabase) Delete(relationship models.Relatio
 	return deleteRelationship(db, relationship)
 }
 
+// DeleteRelationshipBySid 尝试删除给定数据库连接中给定 sid 对应的 relationship 记录
+// 若给定 sid 不存在，会得到 rowsAffected=0 err=nil,没有数据库不会被更改，也不会有错误产生
+// 返回 Rows Affected
+func (rdb *StudentCourseRelationshipDatabase) DeleteBySid(sid string) (rowsAffected int64, err error) {
+	db, err := sql.Open("mysql", rdb.dataSourceName)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	defer db.Close()
+	return deleteRelationshipBySid(db, sid)
+}
+
 /****************************************************/
 /* 👇以下为实际数据库操作，需给定 Open 了的 *DB 进行操作👇  */
 /**************************************************/
@@ -204,7 +217,7 @@ func updateRelationship(db *sql.DB, sid string, relationship models.Relationship
 	return rowsAffected, nil
 }
 
-// deleteRelationship 尝试删除给定数据库连接中给定 sid 对应的 relationship 记录
+// deleteRelationship 尝试删除给定数据库连接中给定的 relationship 记录
 // 若给定 sid 不存在，会得到 rowsAffected=0 err=nil,没有数据库不会被更改，也不会有错误产生
 // 返回 Rows Affected
 func deleteRelationship(db *sql.DB, relationship models.Relationship) (rowsAffected int64, err error) {
@@ -214,6 +227,29 @@ func deleteRelationship(db *sql.DB, relationship models.Relationship) (rowsAffec
 		return 0, err
 	}
 	res, err := stmt.Exec(relationship.Sid, relationship.Cid)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	rowsAffected, err = res.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	return rowsAffected, nil
+}
+
+// deleteRelationshipBySid 尝试删除给定数据库连接中给定 sid 对应的 relationship 记录
+// 若给定 sid 不存在，会得到 rowsAffected=0 err=nil,没有数据库不会被更改，也不会有错误产生
+// 返回 Rows Affected
+func deleteRelationshipBySid(db *sql.DB, sid string) (rowsAffected int64, err error) {
+	stmt, err := db.Prepare("DELETE FROM coursetaking WHERE sid=?")
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	res, err := stmt.Exec(sid)
 	if err != nil {
 		log.Println(err)
 		return 0, err

@@ -17,7 +17,7 @@ type WxNotifier struct {
 	wxTokenHolder          *wxAccessToken.Holder
 }
 
-func NewWxNotifier(courseNoticeTemplateID string, wxTokenHolder *wxAccessToken.Holder) *WxNotifier {
+func New(courseNoticeTemplateID string, wxTokenHolder *wxAccessToken.Holder) *WxNotifier {
 	return &WxNotifier{courseNoticeTemplateID: courseNoticeTemplateID, wxTokenHolder: wxTokenHolder}
 }
 

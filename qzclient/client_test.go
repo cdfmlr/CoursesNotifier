@@ -240,10 +240,10 @@ func TestNewClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewClient(tt.args.student)
+			got := New(tt.args.student)
 			t.Log(got)
-			//if got := NewClient(tt.args.student); !reflect.DeepEqual(got, tt.want) {
-			//	t.Errorf("NewClient() = %v, want %v", got, tt.want)
+			//if got := New(tt.args.student); !reflect.DeepEqual(got, tt.want) {
+			//	t.Errorf("New() = %v, want %v", got, tt.want)
 			//}
 		})
 	}

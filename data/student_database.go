@@ -56,6 +56,18 @@ func (sdb *StudentDatabase) GetStudent(sid string) (*models.Student, error) {
 	return getStudent(db, sid)
 }
 
+// GetByWxUser 返回给定数据库连接中给定 wxUser 为标识的 Student 记录
+// 若指定学生记录不存在将返回 (&models.Student{}, nil)
+func (sdb *StudentDatabase) GetByWxUser(wxUser string) (*models.Student, error) {
+	db, err := sql.Open("mysql", sdb.dataSourceName)
+	if err != nil {
+		log.Println(err)
+		return &models.Student{}, err
+	}
+	defer db.Close()
+	return getStudentByWxUser(db, wxUser)
+}
+
 // Update 用来在数据库中将 sid 标识的记录更新为传入的 student
 // 若给定 sid 不存在，会得到 rowsAffected=0 err=nil,没有数据库不会被更改，也不会有错误产生
 // 返回 Rows Affected
@@ -134,6 +146,28 @@ func getStudents(db *sql.DB) ([]models.Student, error) {
 func getStudent(db *sql.DB, sid string) (*models.Student, error) {
 	var student models.Student
 	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime FROM student WHERE sid=?", sid)
+	if err != nil {
+		log.Println(err)
+		return &student, err
+	}
+	for rows.Next() {
+		var s models.Student
+		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime)
+		if err != nil {
+			log.Println(err)
+			return &student, err
+		}
+		student = s
+		break
+	}
+	return &student, nil
+}
+
+// getStudentByWxUser 返回给定数据库连接中给定 wxUser 为标识的 Student 记录
+// 若指定学生记录不存在将返回 (&models.Student{}, nil)
+func getStudentByWxUser(db *sql.DB, wxUser string) (*models.Student, error) {
+	var student models.Student
+	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime FROM student WHERE wxuser=?", wxUser)
 	if err != nil {
 		log.Println(err)
 		return &student, err

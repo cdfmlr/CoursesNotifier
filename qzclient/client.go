@@ -18,7 +18,7 @@ type Client struct {
 	Courses       map[string]models.Course
 }
 
-func NewClient(student models.Student) *Client {
+func New(student models.Student) *Client {
 	if student.Sid == "" {
 		log.Fatal("student.Sid should not be Empty!")
 	}
@@ -89,7 +89,7 @@ func (c *Client) FetchWeekCoursesSlowly(week int, ch chan []models.Course) {
 	if err != nil {
 		log.Println(err)
 	}
-	var courses []models.Course
+	courses := make([]models.Course, 0)
 	for _, v := range getKbcxAzcRespBodyItems {
 		c := models.NewCourse(v.Kcmc, v.Jsxm, v.Jsmc, v.Kssj, v.Jssj, v.Kkzc, v.Kcsj)
 		courses = append(courses, *c)
