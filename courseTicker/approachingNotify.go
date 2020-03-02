@@ -3,7 +3,7 @@ package courseTicker
 import (
 	"example.com/CoursesNotifier/data"
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qzapi"
+	"example.com/CoursesNotifier/qz/qzapi"
 	"fmt"
 	"log"
 	"math"

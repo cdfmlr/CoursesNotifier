@@ -2,7 +2,7 @@ package app
 
 import (
 	"example.com/CoursesNotifier/courseTicker"
-	"example.com/CoursesNotifier/jsonFileLoader"
+	"example.com/CoursesNotifier/util/jsonFileLoader"
 	"example.com/CoursesNotifier/wx/wxAccessToken"
 	"example.com/CoursesNotifier/wx/wxCoursesNotifier"
 	"example.com/CoursesNotifier/wx/wxPlatformServer"

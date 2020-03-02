@@ -28,7 +28,7 @@ func main() {
 	log.Println("CoursesNotifier Running...")
 
 	http.HandleFunc("/", greet)
-	http.ListenAndServe(":80", nil)
+	http.ListenAndServe(":9001", nil)
 }
 
 func greet(w http.ResponseWriter, r *http.Request) {

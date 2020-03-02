@@ -2,7 +2,7 @@ package qzclient
 
 import (
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qzapi"
+	"example.com/CoursesNotifier/qz/qzapi"
 	"testing"
 )
 
@@ -75,7 +75,7 @@ func TestClient_FetchAllTermCourses(t *testing.T) {
 			name: "test",
 			fields: fields{
 				Student:       *models.NewStudent("201810000431", "hd270516", "sf"),
-				token:         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODI4NjA0NDgsImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.ITkPwi4HOO5f-3ycUs3P1X1uRjoUUFVUuH_J9RcT4PA",
+				token:         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODMxNTQwNTksImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.2W8rqPpRGfB95-pFODhCzIi9Z1iCgygC2x1Palk6EE8",
 				CurrentXnxqId: "2019-2020-2",
 				CurrentWeek:   "2",
 				Courses:       nil,

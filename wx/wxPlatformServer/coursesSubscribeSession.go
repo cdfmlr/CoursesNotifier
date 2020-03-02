@@ -2,7 +2,7 @@ package wxPlatformServer
 
 import (
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qzclient"
+	"example.com/CoursesNotifier/qz/qzclient"
 	"fmt"
 	"strings"
 )

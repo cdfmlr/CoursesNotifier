@@ -3,7 +3,7 @@ package qzclient
 import (
 	"example.com/CoursesNotifier/data"
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qzapi"
+	"example.com/CoursesNotifier/qz/qzapi"
 	"log"
 	"math/rand"
 	"strconv"
@@ -84,7 +84,7 @@ LOOP:
 
 // FetchWeekCoursesSlowly 获取某一周的课程（要反爬虫，速度很慢）
 func (c *Client) FetchWeekCoursesSlowly(week int, ch chan []models.Course) {
-	time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
+	time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 	getKbcxAzcRespBodyItems, err := qzapi.GetKbcxAzc(qzapi.SchoolNcepu, c.token, c.Student.Sid, c.CurrentXnxqId, strconv.Itoa(week))
 	if err != nil {
 		log.Println(err)
