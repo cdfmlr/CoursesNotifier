@@ -34,9 +34,9 @@ type App struct {
 }
 
 type AppConf struct {
-	Wx       WxConf     `json:"wx"`
-	Ticker   TickerConf `json:"ticker"`
-	Database string     `json:"database"`
+	Wx     WxConf     `json:"wx"`
+	Ticker TickerConf `json:"ticker"`
+	Data   DataConf   `json:"data"`
 }
 
 type WxConf struct {
@@ -50,6 +50,11 @@ type TickerConf struct {
 	timeToStart                string  `json:"time_to_start"`
 	PeriodMinute               int     `json:"period_minute"`
 	MinuteBeforeCourseToNotify float64 `json:"minute_before_course_to_notify"`
+}
+
+type DataConf struct {
+	Database string     `json:"database"`
+	BullshitDataFile string `json:"bullshit_data_file"`
 }
 
 type AppRuntime struct {
@@ -75,6 +80,12 @@ func New(configFilePath string) *App {
 	return a
 }
 
+// Test 测试配置完整性、正确行, 若配置完整、可用，则返回 nil，否则返回错误 error
+func (app *App) Test() error {
+	// TODO: Implement config test.
+	return nil
+}
+
 func (app *App) Run() {
 	app.runWxPlatformServer()
 	app.runCourseTicker()
@@ -87,8 +98,8 @@ func (app *App) initWxAccessTokenHolder() {
 
 // 初始化微信公众号服务
 func (app *App) initWxPlatformServer() {
-	responser := wxPlatformServer.NewCourseNotifierResponser(app.conf.Database)
-	app.runtime.pWxPlatformServer = wxPlatformServer.New(app.conf.Wx.ReqToken, responser, app.conf.Database)
+	responser := wxPlatformServer.NewCourseNotifierResponser(app.conf.Data.Database)
+	app.runtime.pWxPlatformServer = wxPlatformServer.New(app.conf.Wx.ReqToken, responser, app.conf.Data.Database)
 }
 
 // 初始化课程时钟
@@ -96,7 +107,7 @@ func (app *App) initCoursesTicker() {
 	// 新建 课程时钟
 	app.runtime.pCoursesTicker = courseTicker.NewCoursesTicker(
 		"CourseTicker",
-		app.conf.Database,
+		app.conf.Data.Database,
 		time.Duration(app.conf.Ticker.PeriodMinute)*time.Minute,
 		app.conf.Ticker.MinuteBeforeCourseToNotify,
 		[]courseTicker.Notifier{
@@ -104,6 +115,7 @@ func (app *App) initCoursesTicker() {
 			wxCoursesNotifier.New(
 				app.conf.Wx.CourseNoticeTemplateID,
 				app.runtime.pWxAccessTokenHolder,
+				app.conf.Data.BullshitDataFile,
 			),
 		},
 	)

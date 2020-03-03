@@ -32,14 +32,15 @@ import (
 type WxNotifier struct {
 	courseNoticeTemplateID string
 	wxTokenHolder          *wxAccessToken.Holder
+	bullshitDataFilePath   string
 }
 
-func New(courseNoticeTemplateID string, wxTokenHolder *wxAccessToken.Holder) *WxNotifier {
-	return &WxNotifier{courseNoticeTemplateID: courseNoticeTemplateID, wxTokenHolder: wxTokenHolder}
+func New(courseNoticeTemplateID string, wxTokenHolder *wxAccessToken.Holder, bullshitDataFilePath string) *WxNotifier {
+	return &WxNotifier{courseNoticeTemplateID: courseNoticeTemplateID, wxTokenHolder: wxTokenHolder, bullshitDataFilePath: bullshitDataFilePath}
 }
 
 func (w WxNotifier) Notify(student *models.Student, course *models.Course) {
-	bullshit := briefBullshitGenerator.Generate()
+	bullshit := briefBullshitGenerator.Generate(w.bullshitDataFilePath)
 	noticeBody, err := w.makeCourseNoticeBody(student.WxUser, course.Name, course.Location, course.Teacher, course.Begin, course.End, course.Week, bullshit)
 	err = w.postCourseNotify(noticeBody)
 	if err != nil {
@@ -48,6 +49,8 @@ func (w WxNotifier) Notify(student *models.Student, course *models.Course) {
 }
 
 // NoticeItem, CourseData, WxNotice 为微信公众号课程通知 json 的各级组成部分
+// 对应的微信模版内容应设置如下：
+// {{first.DATA}} 课程：{{course.DATA}} 地点：{{location.DATA}} 老师：{{teacher.DATA}} 时间：{{time.DATA}} 教学周：{{week.DATA}} --- {{bullshit.DATA}} {{remark.DATA}}
 type NoticeItem struct {
 	Value string `json:"value"`
 	Color string `json:"color"`
@@ -92,7 +95,7 @@ func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, begi
 				Value: teacher + "\n\n",
 				Color: "#173177",
 			},
-			BETime:NoticeItem{
+			BETime: NoticeItem{
 				Value: begin + "~" + end + "\n\n",
 				Color: "#173177",
 			},
@@ -100,7 +103,7 @@ func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, begi
 				Value: week + "\n\n",
 				Color: "#173177",
 			},
-			Bullshit:NoticeItem{
+			Bullshit: NoticeItem{
 				Value: bullshit,
 				Color: "#5677fc",
 			},

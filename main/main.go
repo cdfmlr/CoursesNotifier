@@ -39,6 +39,11 @@ func main() {
 	}
 
 	coursesNotifier := app.New(*confFile)
+	if err := coursesNotifier.Test(); err != nil {
+		fmt.Println(err)
+		fmt.Println("Cannot run app with error config.")
+		return
+	}
 	coursesNotifier.Run()
 
 	log.Println("CoursesNotifier Running...")
