@@ -38,7 +38,7 @@ func (s *CoursesSubscribeSession) Verify() string {
 	realName, school := authRespBody.UserRealName, authRespBody.UserDwmc // 姓名、院系
 
 	if err != nil {
-		return "(0x196) 抱歉，系统无法处理您提供的信息，请查正后再试。若问题持续存在，请联系管理员。"
+		return "抱歉，系统系统不认识您，请查正您提供的信息后再试。若问题持续存在，请联系管理员。"
 	}
 
 	ch := make(chan []models.Course)
@@ -52,7 +52,7 @@ func (s *CoursesSubscribeSession) Verify() string {
 	}
 
 	if err != nil || len(courses) == 0 {
-		return "(0x196) 抱歉，系统无法获取您的课表，请查正后再试。若问题持续存在，请联系管理员。"
+		return "抱歉，系统无法获取您的课表，请查正后再试。若问题持续存在，请联系管理员。"
 	}
 
 	// 合并为一个可读字符串
@@ -64,7 +64,7 @@ func (s *CoursesSubscribeSession) Verify() string {
 	s.GenerateVerification()
 
 	return fmt.Sprintf(
-		"(0x064) 根据您提供的信息，我们查询到您是 %s 的 %s。您本学期的课程有: %s\n如果信息正确，且确认订阅课程提醒服务，请回复数字验证码：【%s】(五分钟内有效)",
+		"根据您提供的信息，我们查询到您是 %s 的 %s。您本学期的课程有: %s\n如果信息正确，且确认订阅课程提醒服务，请回复数字验证码：【%s】(五分钟内有效)",
 		school,
 		realName,
 		coursesStr,
@@ -80,7 +80,7 @@ func (s *CoursesSubscribeSession) Continue(verificationCode string) string {
 	}
 	affected := s.qzClient.Save(s.databaseSource)
 	if affected > 0 {
-		return "(0x0C8) 订阅成功！"
+		return "订阅成功！\n我们会在每门课上课前通知你哦。🤝"
 	} else { // 数据库一行都没动，其实是失败的！
 		return "(0x130) 订阅成功！"
 	}

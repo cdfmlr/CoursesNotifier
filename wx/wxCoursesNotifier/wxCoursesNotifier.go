@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"example.com/CoursesNotifier/models"
+	"example.com/CoursesNotifier/util/briefBullshitGenerator"
 	"example.com/CoursesNotifier/wx/wxAccessToken"
 	"fmt"
 	"io/ioutil"
@@ -22,7 +23,8 @@ func New(courseNoticeTemplateID string, wxTokenHolder *wxAccessToken.Holder) *Wx
 }
 
 func (w WxNotifier) Notify(student *models.Student, course *models.Course) {
-	noticeBody, err := w.makeCourseNoticeBody(student.WxUser, course.Name, course.Location, course.Teacher, course.Week)
+	bullshit := briefBullshitGenerator.Generate()
+	noticeBody, err := w.makeCourseNoticeBody(student.WxUser, course.Name, course.Location, course.Teacher, course.Begin, course.End, course.Week, bullshit)
 	err = w.postCourseNotify(noticeBody)
 	if err != nil {
 		// TODO: Do something here.
@@ -40,7 +42,9 @@ type CourseData struct {
 	Course   NoticeItem `json:"course"`
 	Location NoticeItem `json:"location"`
 	Teacher  NoticeItem `json:"teacher"`
+	BETime   NoticeItem `json:"time"`
 	Week     NoticeItem `json:"week"`
+	Bullshit NoticeItem `json:"bullshit"`
 	Remark   NoticeItem `json:"remark"`
 }
 
@@ -51,14 +55,14 @@ type WxNotice struct {
 }
 
 // makeCourseNoticeBody 构建微信上课通知 json
-func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, week string) ([]byte, error) {
+func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, begin, end, week, bullshit string) ([]byte, error) {
 	notice := WxNotice{
 		ToUser:     toUser,
 		TemplateId: w.courseNoticeTemplateID,
 		Data: CourseData{
 			First: NoticeItem{
 				Value: "滚去上课" + "\n\n",
-				Color: "#173177",
+				Color: "#e51c23",
 			},
 			Course: NoticeItem{
 				Value: course + "\n\n",
@@ -72,13 +76,21 @@ func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, week
 				Value: teacher + "\n\n",
 				Color: "#173177",
 			},
+			BETime:NoticeItem{
+				Value: begin + "~" + end + "\n\n",
+				Color: "#173177",
+			},
 			Week: NoticeItem{
 				Value: week + "\n\n",
 				Color: "#173177",
 			},
+			Bullshit:NoticeItem{
+				Value: bullshit,
+				Color: "#5677fc",
+			},
 			Remark: NoticeItem{
-				Value: "🤯" + "\n\n",
-				Color: "#173177",
+				Value: "但还是要好好听课哦💪" + "\n\n",
+				Color: "#000000",
 			},
 		},
 	}
