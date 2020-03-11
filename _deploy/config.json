@@ -10,5 +10,8 @@
     "period_minute": 10,
     "minute_before_course_to_notify": 15
   },
-  "database": "@/coursenotifier?charset=utf8"
+  "data": {
+    "database": "@/coursenotifier?charset=utf8",
+    "bullshit_data_file": "~/bullshit_data.json"
+  }
 }

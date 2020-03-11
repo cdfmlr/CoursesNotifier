@@ -50,7 +50,7 @@ type Course struct {
 func NewCourse(name string, teacher string, location string, begin string, end string, week string, when string) *Course {
 	course := &Course{Name: name, Teacher: teacher, Location: location, Begin: begin, End: end, Week: week, When: when}
 
-	// 计算 cid，Name,Teacher,Location,Begin,End,Week,When 的 md5 和
+	// 计算 cid：Name,Teacher,Location,Begin,End,Week,When 的 md5 和
 	sl := []string{name, teacher, location, begin, end, week, when}
 	data := []byte(strings.Join(sl, ""))
 	cid := fmt.Sprintf("%x", md5.Sum(data))

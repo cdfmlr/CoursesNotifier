@@ -36,9 +36,9 @@ const secondToWeek = 60 * 60 * 24 * 7
 // 找出 minuteBeforeCourseToNotify 分钟内要开始的课，
 // 以及上这些课的学生，调用 notifiers 进行通知。
 func (ct *CoursesTicker) NotifyApproachingCourses() {
-	// 今天星期几
-	currentWeek := getCurrentWeek(ct.databaseSource)
 	// 今天第几周
+	currentWeek := getCurrentWeek(ct.databaseSource)
+	// 今天星期几
 	todayQzWeekday := qzapi.TimeWeekToQzWeekday(time.Now().Weekday())
 
 	// 最近一个可能上课的时间
@@ -175,12 +175,12 @@ func getCurrentWeek(databaseSource string) int {
 	return 1 + _durationToWeek(diff)
 }
 
-// durationToWeek convert a duration into week
+// _durationToWeek convert a duration into week
 func _durationToWeek(duration time.Duration) int {
 	return _roundTime(duration.Seconds() / secondToWeek)
 }
 
-// roundTime helps getting a reasonable int from a float, which is of great help when converting the duration into week
+// _roundTime helps getting a reasonable int from a float, which is of great help when converting the duration into week
 func _roundTime(input float64) int {
 	var result float64
 
