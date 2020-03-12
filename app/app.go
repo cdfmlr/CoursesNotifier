@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -47,13 +48,13 @@ type WxConf struct {
 }
 
 type TickerConf struct {
-	timeToStart                string  `json:"time_to_start"`
+	TimeToStart                string  `json:"time_to_start"`
 	PeriodMinute               int     `json:"period_minute"`
 	MinuteBeforeCourseToNotify float64 `json:"minute_before_course_to_notify"`
 }
 
 type DataConf struct {
-	Database string     `json:"database"`
+	Database         string `json:"database"`
 	BullshitDataFile string `json:"bullshit_data_file"`
 }
 
@@ -72,21 +73,57 @@ func New(configFilePath string) *App {
 		fmt.Fprintln(os.Stderr, "Failed to load configuration: ", err)
 	}
 
-	// 初始化运行时组件
-	a.initWxAccessTokenHolder()
-	a.initWxPlatformServer()
-	a.initCoursesTicker()
-
 	return a
 }
 
 // Test 测试配置完整性、正确行, 若配置完整、可用，则返回 nil，否则返回错误 error
 func (app *App) Test() error {
-	// TODO: Implement config test.
+	errs := make([]*ConfingMissing, 0)
+	// fmt.Println(app)
+	if app.conf.Ticker.PeriodMinute == int(0) {
+		errs = append(errs, NewConfingMissing("Ticker.PeriodMinute"))
+	}
+	if strings.TrimSpace(app.conf.Ticker.TimeToStart) == "" {
+		errs = append(errs, NewConfingMissing("Ticker.TimeToStart"))
+	}
+	if app.conf.Ticker.MinuteBeforeCourseToNotify == float64(0) {
+		errs = append(errs, NewConfingMissing("Ticker.MinuteBeforeCourseToNotify"))
+	}
+	if strings.TrimSpace(app.conf.Wx.AppID) == "" {
+		errs = append(errs, NewConfingMissing("Wx.AppID"))
+	}
+	if strings.TrimSpace(app.conf.Wx.AppSecret) == "" {
+		errs = append(errs, NewConfingMissing("Wx.AppSecret"))
+	}
+	if strings.TrimSpace(app.conf.Wx.CourseNoticeTemplateID) == "" {
+		errs = append(errs, NewConfingMissing("Wx.CourseNoticeTemplateID"))
+	}
+	if strings.TrimSpace(app.conf.Wx.ReqToken) == "" {
+		errs = append(errs, NewConfingMissing("Wx.ReqToken"))
+	}
+	if strings.TrimSpace(app.conf.Data.Database) == "" {
+		errs = append(errs, NewConfingMissing("Data.Database"))
+	}
+	if strings.TrimSpace(app.conf.Data.BullshitDataFile) == "" {
+		errs = append(errs, NewConfingMissing("Data.BullshitDataFile"))
+	}
+	if len(errs) != 0 {
+		s := ""
+		for _, e := range errs {
+			s += e.miss + ", "
+		}
+		return *NewConfingMissing(strings.Trim(s, ", "))
+	}
 	return nil
 }
 
 func (app *App) Run() {
+	// 初始化运行时组件
+	app.initWxAccessTokenHolder()
+	app.initWxPlatformServer()
+	app.initCoursesTicker()
+
+	// 启动守护任务
 	app.runWxPlatformServer()
 	app.runCourseTicker()
 }
@@ -128,6 +165,20 @@ func (app *App) runWxPlatformServer() {
 
 // 开始运行课程时钟
 func (app *App) runCourseTicker() {
-	timeToStart, _ := time.Parse("2006-01-02 15:04", app.conf.Ticker.timeToStart)
+	timeToStart, _ := time.Parse("2006-01-02 15:04", app.conf.Ticker.TimeToStart)
 	app.runtime.pCoursesTicker.Start(timeToStart)
+}
+
+type ConfingMissing struct {
+	miss string
+}
+
+func NewConfingMissing(miss string) *ConfingMissing {
+	return &ConfingMissing{miss: miss}
+}
+
+func (c ConfingMissing) Error() string {
+	s := "Config missing: " + c.miss
+	// fmt.Println(s)
+	return s
 }
