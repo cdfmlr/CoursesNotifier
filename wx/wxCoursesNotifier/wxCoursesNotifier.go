@@ -80,27 +80,27 @@ func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, begi
 		TemplateId: w.courseNoticeTemplateID,
 		Data: CourseData{
 			First: NoticeItem{
-				Value: "滚去上课" + "\n\n",
+				Value: "滚去上课" + "\n",
 				Color: "#e51c23",
 			},
 			Course: NoticeItem{
-				Value: course + "\n\n",
+				Value: course + "\n",
 				Color: "#173177",
 			},
 			Location: NoticeItem{
-				Value: location + "\n\n",
+				Value: location + "\n",
 				Color: "#173177",
 			},
 			Teacher: NoticeItem{
-				Value: teacher + "\n\n",
+				Value: teacher + "\n",
 				Color: "#173177",
 			},
 			BETime: NoticeItem{
-				Value: begin + "~" + end + "\n\n",
+				Value: begin + "~" + end + "\n",
 				Color: "#173177",
 			},
 			Week: NoticeItem{
-				Value: week + "\n\n",
+				Value: week + "\n",
 				Color: "#173177",
 			},
 			Bullshit: NoticeItem{
@@ -108,7 +108,7 @@ func (w WxNotifier) makeCourseNoticeBody(toUser, course, location, teacher, begi
 				Color: "#5677fc",
 			},
 			Remark: NoticeItem{
-				Value: "但还是要好好听课哦💪" + "\n\n",
+				Value: "\n但还是要好好听课哦💪" + "\n\n",
 				Color: "#000000",
 			},
 		},
