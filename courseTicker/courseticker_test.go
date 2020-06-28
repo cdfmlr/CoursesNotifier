@@ -8,10 +8,10 @@ import (
 )
 
 func TestCoursesTicker(t *testing.T) {
-	h := wxAccessToken.NewHolder("wx63cf76ed67d69bb1", "8a62c82aeac97ebf79b4617049499302")
+	h := wxAccessToken.NewHolder("***", "***")
 	ct := NewCoursesTicker(
-		"courseTicker", "c:000123@/test?charset=utf8", time.Second*2, 10,
-		[]Notifier{LogNotifier("LN"), wxCoursesNotifier.New("-mQRq0B8nP5g5auWBOaAO0uLr64owmoNtwqJBrkz5G0", h, "")},
+		"courseTicker", "c:***@/test?charset=utf8", time.Second*2, 10,
+		[]Notifier{LogNotifier("LN"), wxCoursesNotifier.New("-***", h, "")},
 	)
 	ct.Start(time.Now())
 	timer := time.NewTimer(time.Second * 10)
