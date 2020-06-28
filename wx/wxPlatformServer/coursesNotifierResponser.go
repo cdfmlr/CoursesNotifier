@@ -65,8 +65,10 @@ func (c CourseNotifierResponser) Do(reqUser string, reqContent string) (respCont
 
 退订课程提醒业务，请回复"退订"二字。
 
+👉【限时特惠】现在订阅课表，附赠考试后出成绩自动提醒功能！👈
+
 (本服务非官方提供，对服务质量不做保证！)
-All rights reserved © 2020 CDFMLR
+All rights reserved © 2020 CDFMLR 🤪
 `
 }
 

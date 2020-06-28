@@ -21,11 +21,12 @@ import (
 )
 
 type Student struct {
-	Sid        string   // 学号
-	Pwd        string   // 教务密码
-	WxUser     string   // 微信用户公众号openid
-	Courses    []Course // 课程列表
-	CreateTime int64    // 创建时间
+	Sid         string   // 学号
+	Pwd         string   // 教务密码
+	WxUser      string   // 微信用户公众号openid
+	Courses     []Course // 课程列表
+	CreateTime  int64    // 创建时间
+	ExamResults string   // 已出成绩的课程名字列表
 }
 
 // NewStudent returns a Student of given sid and pwd

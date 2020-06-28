@@ -58,7 +58,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 
 func usage() {
 	fmt.Fprintf(os.Stderr, `
-CoursesNotifier v0.1.0 for NCEPU(Baoding)
+CoursesNotifier v0.1.1 for NCEPU(Baoding)
 All rights reserved (c) 2020 CDFMLR
 
 Usage: CoursesNotifier [-c filename]

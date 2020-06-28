@@ -119,12 +119,12 @@ func (sdb *StudentDatabase) Delete(sid string) (rowsAffected int64, err error) {
 // 若给定学生 sid 已存在，数据库不会被更改，并返回一个错误（err!=nil）
 // 返回 Rows Affected
 func insertStudent(db *sql.DB, student models.Student) (rowsAffected int64, err error) {
-	stmt, err := db.Prepare("INSERT INTO student SET sid=?,pwd=?,wxuser=?,createtime=?")
+	stmt, err := db.Prepare("INSERT INTO student SET sid=?,pwd=?,wxuser=?,createtime=?,examresults=?")
 	if err != nil {
 		log.Println(err)
 		return 0, err
 	}
-	res, err := stmt.Exec(student.Sid, student.Pwd, student.WxUser, student.CreateTime)
+	res, err := stmt.Exec(student.Sid, student.Pwd, student.WxUser, student.CreateTime, student.ExamResults)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -140,14 +140,14 @@ func insertStudent(db *sql.DB, student models.Student) (rowsAffected int64, err 
 // getStudents 返回给定数据库连接中所有 Student 记录
 func getStudents(db *sql.DB) ([]models.Student, error) {
 	var students []models.Student
-	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime FROM student")
+	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime,examresults FROM student")
 	if err != nil {
 		log.Println(err)
 		return students, err
 	}
 	for rows.Next() {
 		var s models.Student
-		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime)
+		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime, &s.ExamResults)
 		if err != nil {
 			log.Println(err)
 			return students, err
@@ -161,14 +161,14 @@ func getStudents(db *sql.DB) ([]models.Student, error) {
 // 若指定学生记录不存在将返回 (&models.Student{}, nil)
 func getStudent(db *sql.DB, sid string) (*models.Student, error) {
 	var student models.Student
-	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime FROM student WHERE sid=?", sid)
+	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime,examresults FROM student WHERE sid=?", sid)
 	if err != nil {
 		log.Println(err)
 		return &student, err
 	}
 	for rows.Next() {
 		var s models.Student
-		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime)
+		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime, &s.ExamResults)
 		if err != nil {
 			log.Println(err)
 			return &student, err
@@ -183,14 +183,14 @@ func getStudent(db *sql.DB, sid string) (*models.Student, error) {
 // 若指定学生记录不存在将返回 (&models.Student{}, nil)
 func getStudentByWxUser(db *sql.DB, wxUser string) (*models.Student, error) {
 	var student models.Student
-	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime FROM student WHERE wxuser=?", wxUser)
+	rows, err := db.Query("SELECT sid,pwd,wxuser,createtime,examresults FROM student WHERE wxuser=?", wxUser)
 	if err != nil {
 		log.Println(err)
 		return &student, err
 	}
 	for rows.Next() {
 		var s models.Student
-		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime)
+		err = rows.Scan(&s.Sid, &s.Pwd, &s.WxUser, &s.CreateTime, &s.ExamResults)
 		if err != nil {
 			log.Println(err)
 			return &student, err
@@ -205,12 +205,12 @@ func getStudentByWxUser(db *sql.DB, wxUser string) (*models.Student, error) {
 // 若给定 sid 不存在，会得到 rowsAffected=0 err=nil,没有数据库不会被更改，也不会有错误产生
 // 返回 Rows Affected
 func updateStudent(db *sql.DB, sid string, student models.Student) (rowsAffected int64, err error) {
-	stmt, err := db.Prepare("UPDATE student SET pwd=?,wxuser=?,createtime=? WHERE sid=?")
+	stmt, err := db.Prepare("UPDATE student SET pwd=?,wxuser=?,createtime=?,examresults=? WHERE sid=?")
 	if err != nil {
 		log.Println(err)
 		return 0, err
 	}
-	res, err := stmt.Exec(student.Pwd, student.WxUser, student.CreateTime, sid)
+	res, err := stmt.Exec(student.Pwd, student.WxUser, student.CreateTime, student.ExamResults, sid)
 	if err != nil {
 		log.Println(err)
 		return 0, err

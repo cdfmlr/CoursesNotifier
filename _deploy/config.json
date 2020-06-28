@@ -3,12 +3,17 @@
     "app_id": "",
     "app_secret": "",
     "req_token": "",
-    "course_notice_template_id": ""
+    "course_notice_template_id": "",
+    "exam_result_notice_template_id": ""
   },
-  "ticker": {
+  "course_ticker": {
     "time_to_start": "2020-03-01 16:57",
     "period_minute": 10,
     "minute_before_course_to_notify": 15
+  },
+  "exam_result_ticker": {
+    "time_to_start": "2020-06-28 12:55",
+    "period_minute": 60
   },
   "data": {
     "database": "@/coursenotifier?charset=utf8",

@@ -130,8 +130,8 @@ func (c *Client) appendCourse(courses []models.Course) {
 	}
 }
 
-// Save 将数据（student、course、s_c_relationship）保存到数据库
-func (c *Client) Save(databaseSource string) (rowsAffected int64) {
+// SaveSCR 将数据（student、course、s_c_relationship）保存到数据库
+func (c *Client) SaveSCR(databaseSource string) (rowsAffected int64) {
 	var totalAffected int64
 
 	totalAffected += c.saveStudent(databaseSource)

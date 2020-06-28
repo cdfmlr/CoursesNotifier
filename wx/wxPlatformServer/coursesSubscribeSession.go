@@ -94,7 +94,7 @@ func (s *CoursesSubscribeSession) Continue(verificationCode string) string {
 	if verificationCode != s.verification { // 验证码错误
 		return "验证码错误，以为您取消订阅。"
 	}
-	affected := s.qzClient.Save(s.databaseSource)
+	affected := s.qzClient.SaveSCR(s.databaseSource)
 	if affected > 0 {
 		return "订阅成功！\n我们会在每门课上课前通知你哦。🤝"
 	} else { // 数据库一行都没动，其实是失败的！

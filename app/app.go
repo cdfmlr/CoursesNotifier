@@ -18,9 +18,11 @@ package app
 
 import (
 	"example.com/CoursesNotifier/courseTicker"
+	"example.com/CoursesNotifier/examResultTicker"
 	"example.com/CoursesNotifier/util/jsonFileLoader"
 	"example.com/CoursesNotifier/wx/wxAccessToken"
 	"example.com/CoursesNotifier/wx/wxCoursesNotifier"
+	"example.com/CoursesNotifier/wx/wxExamResultNotifier"
 	"example.com/CoursesNotifier/wx/wxPlatformServer"
 	"fmt"
 	"net/http"
@@ -35,22 +37,29 @@ type App struct {
 }
 
 type AppConf struct {
-	Wx     WxConf     `json:"wx"`
-	Ticker TickerConf `json:"ticker"`
-	Data   DataConf   `json:"data"`
+	Wx               WxConf               `json:"wx"`
+	CourseTicker     CourseTickerConf     `json:"course_ticker"`
+	ExamResultTicker ExamResultTickerConf `json:"exam_result_ticker"`
+	Data             DataConf             `json:"data"`
 }
 
 type WxConf struct {
-	AppID                  string `json:"app_id"`
-	AppSecret              string `json:"app_secret"`
-	ReqToken               string `json:"req_token"`
-	CourseNoticeTemplateID string `json:"course_notice_template_id"`
+	AppID                      string `json:"app_id"`
+	AppSecret                  string `json:"app_secret"`
+	ReqToken                   string `json:"req_token"`
+	CourseNoticeTemplateID     string `json:"course_notice_template_id"`
+	ExamResultNoticeTemplateID string `json:"exam_result_notice_template_id"`
 }
 
-type TickerConf struct {
+type CourseTickerConf struct {
 	TimeToStart                string  `json:"time_to_start"`
 	PeriodMinute               int     `json:"period_minute"`
 	MinuteBeforeCourseToNotify float64 `json:"minute_before_course_to_notify"`
+}
+
+type ExamResultTickerConf struct {
+	TimeToStart  string `json:"time_to_start"`
+	PeriodMinute int    `json:"period_minute"`
 }
 
 type DataConf struct {
@@ -61,6 +70,7 @@ type DataConf struct {
 type AppRuntime struct {
 	pWxAccessTokenHolder *wxAccessToken.Holder
 	pCoursesTicker       *courseTicker.CoursesTicker
+	pExamResultTicker    *examResultTicker.ExamResultTicker
 	pWxPlatformServer    *wxPlatformServer.WxPlatformServer
 }
 
@@ -79,16 +89,27 @@ func New(configFilePath string) *App {
 // Test 测试配置完整性、正确行, 若配置完整、可用，则返回 nil，否则返回错误 error
 func (app *App) Test() error {
 	errs := make([]*ConfigMissing, 0)
-	// fmt.Println(app)
-	if app.conf.Ticker.PeriodMinute == int(0) {
-		errs = append(errs, NewConfigMissing("Ticker.PeriodMinute"))
+
+	// CourseTicker
+	if app.conf.CourseTicker.PeriodMinute == int(0) {
+		errs = append(errs, NewConfigMissing("CourseTicker.PeriodMinute"))
 	}
-	if strings.TrimSpace(app.conf.Ticker.TimeToStart) == "" {
-		errs = append(errs, NewConfigMissing("Ticker.TimeToStart"))
+	if strings.TrimSpace(app.conf.CourseTicker.TimeToStart) == "" {
+		errs = append(errs, NewConfigMissing("CourseTicker.TimeToStart"))
 	}
-	if app.conf.Ticker.MinuteBeforeCourseToNotify == float64(0) {
-		errs = append(errs, NewConfigMissing("Ticker.MinuteBeforeCourseToNotify"))
+	if app.conf.CourseTicker.MinuteBeforeCourseToNotify == float64(0) {
+		errs = append(errs, NewConfigMissing("CourseTicker.MinuteBeforeCourseToNotify"))
 	}
+
+	// ExamResultTicker
+	if app.conf.ExamResultTicker.PeriodMinute == 0 {
+		errs = append(errs, NewConfigMissing("ExamResultTicker.PeriodMinute"))
+	}
+	if strings.TrimSpace(app.conf.ExamResultTicker.TimeToStart) == "" {
+		errs = append(errs, NewConfigMissing("ExamResultTicker.TimeToStart"))
+	}
+
+	// Wx
 	if strings.TrimSpace(app.conf.Wx.AppID) == "" {
 		errs = append(errs, NewConfigMissing("Wx.AppID"))
 	}
@@ -98,15 +119,21 @@ func (app *App) Test() error {
 	if strings.TrimSpace(app.conf.Wx.CourseNoticeTemplateID) == "" {
 		errs = append(errs, NewConfigMissing("Wx.CourseNoticeTemplateID"))
 	}
+	if strings.TrimSpace(app.conf.Wx.ExamResultNoticeTemplateID) == "" {
+		errs = append(errs, NewConfigMissing("Wx.ExamResultNoticeTemplateID"))
+	}
 	if strings.TrimSpace(app.conf.Wx.ReqToken) == "" {
 		errs = append(errs, NewConfigMissing("Wx.ReqToken"))
 	}
+
+	// Data
 	if strings.TrimSpace(app.conf.Data.Database) == "" {
 		errs = append(errs, NewConfigMissing("Data.Database"))
 	}
 	if strings.TrimSpace(app.conf.Data.BullshitDataFile) == "" {
 		errs = append(errs, NewConfigMissing("Data.BullshitDataFile"))
 	}
+
 	if len(errs) != 0 {
 		s := ""
 		for _, e := range errs {
@@ -122,10 +149,12 @@ func (app *App) Run() {
 	app.initWxAccessTokenHolder()
 	app.initWxPlatformServer()
 	app.initCoursesTicker()
+	app.initExamResultTicker()
 
 	// 启动守护任务
 	app.runWxPlatformServer()
 	app.runCourseTicker()
+	app.runExamResultTicker()
 }
 
 // 初始化微信公众号 access_token holder
@@ -145,12 +174,29 @@ func (app *App) initCoursesTicker() {
 	app.runtime.pCoursesTicker = courseTicker.NewCoursesTicker(
 		"CourseTicker",
 		app.conf.Data.Database,
-		time.Duration(app.conf.Ticker.PeriodMinute)*time.Minute,
-		app.conf.Ticker.MinuteBeforeCourseToNotify,
+		time.Duration(app.conf.CourseTicker.PeriodMinute)*time.Minute,
+		app.conf.CourseTicker.MinuteBeforeCourseToNotify,
 		[]courseTicker.Notifier{
-			courseTicker.LogNotifier("LogNotifier"),
+			courseTicker.LogNotifier("LogNotifier >> course"),
 			wxCoursesNotifier.New(
 				app.conf.Wx.CourseNoticeTemplateID,
+				app.runtime.pWxAccessTokenHolder,
+				app.conf.Data.BullshitDataFile,
+			),
+		},
+	)
+}
+
+// 初始化考试成绩时钟
+func (app *App) initExamResultTicker() {
+	app.runtime.pExamResultTicker = examResultTicker.NewExamResultTicker(
+		"ExamResultTicker",
+		app.conf.Data.Database,
+		time.Duration(app.conf.ExamResultTicker.PeriodMinute)*time.Minute,
+		[]examResultTicker.Notifier{
+			examResultTicker.LogNotifier("LogNotifier >> examResult"),
+			wxExamResultNotifier.New(
+				app.conf.Wx.ExamResultNoticeTemplateID,
 				app.runtime.pWxAccessTokenHolder,
 				app.conf.Data.BullshitDataFile,
 			),
@@ -165,8 +211,14 @@ func (app *App) runWxPlatformServer() {
 
 // 开始运行课程时钟
 func (app *App) runCourseTicker() {
-	timeToStart, _ := time.Parse("2006-01-02 15:04", app.conf.Ticker.TimeToStart)
+	timeToStart, _ := time.Parse("2006-01-02 15:04", app.conf.CourseTicker.TimeToStart)
 	app.runtime.pCoursesTicker.Start(timeToStart)
+}
+
+// 开始运行考试成绩时钟
+func (app *App) runExamResultTicker() {
+	timeToStart, _ := time.Parse("2006-01-02 15:04", app.conf.ExamResultTicker.TimeToStart)
+	app.runtime.pExamResultTicker.Start(timeToStart)
 }
 
 type ConfigMissing struct {

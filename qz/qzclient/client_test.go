@@ -272,8 +272,8 @@ func TestClient_Save(t *testing.T) {
 			ch := make(chan []models.Course)
 			go c.FetchAllTermCourses(ch)
 			t.Log("len(<-ch)", len(<-ch))
-			if gotRowsAffected := c.Save(tt.args.databaseSource); gotRowsAffected == 0 {
-				t.Errorf("Save() = %v, want %v", gotRowsAffected, tt.wantRowsAffected)
+			if gotRowsAffected := c.SaveSCR(tt.args.databaseSource); gotRowsAffected == 0 {
+				t.Errorf("SaveSCR() = %v, want %v", gotRowsAffected, tt.wantRowsAffected)
 			} else {
 				t.Log(gotRowsAffected)
 			}

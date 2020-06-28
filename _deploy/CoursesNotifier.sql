@@ -44,4 +44,7 @@ CREATE TABLE IF NOT EXISTS current
 );
 
 
+alter table student
+    add examresults nvarchar(1023) default '' null;
+
 -- INSERT INTO current (termbegin) VALUES ('2020-02-17');

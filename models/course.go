@@ -36,7 +36,7 @@ import (
     }
 */
 type Course struct {
-	Cid      string // 该系统内部课程识别码，Name,Teacher,Location,Begin,End,Week,When 的 md5 和
+	Cid      string // 该系统内部课程识别码，Name,Teacher,Location,Begin,Stop,Week,When 的 md5 和
 	Name     string // 课程名称 <- kcmc
 	Teacher  string // 任课老师 <- jsxm
 	Location string // 上课地点 <- jsmc
@@ -46,11 +46,11 @@ type Course struct {
 	When     string // 上课节次 <- kcsj
 }
 
-// NewCourse 返回给定 Name,Teacher,Location,Begin,End,Week,When 所决定的 Course，cid 会在此完成计算
+// NewCourse 返回给定 Name,Teacher,Location,Begin,Stop,Week,When 所决定的 Course，cid 会在此完成计算
 func NewCourse(name string, teacher string, location string, begin string, end string, week string, when string) *Course {
 	course := &Course{Name: name, Teacher: teacher, Location: location, Begin: begin, End: end, Week: week, When: when}
 
-	// 计算 cid：Name,Teacher,Location,Begin,End,Week,When 的 md5 和
+	// 计算 cid：Name,Teacher,Location,Begin,Stop,Week,When 的 md5 和
 	sl := []string{name, teacher, location, begin, end, week, when}
 	data := []byte(strings.Join(sl, ""))
 	cid := fmt.Sprintf("%x", md5.Sum(data))
