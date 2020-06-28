@@ -24,7 +24,8 @@
 **基于项目**:
 
 * 微信公众号服务： [腾讯/微信公众平台](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
-* 强智教务系统API： [TLingC/QZAPI](https://github.com/TLingC/QZAPI/)
+* 强智教务系统 API： [TLingC/QZAPI](https://github.com/TLingC/QZAPI/)
+* 强智教务系统 Go SDK 实现：[cdfmlr/qzgo](https://github.com/cdfmlr/qzgo)
 
 ## 工作原理
 

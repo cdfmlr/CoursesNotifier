@@ -2,8 +2,13 @@ package qzclient
 
 import (
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qz/qzapi"
+	"github.com/cdfmlr/qzgo"
 	"testing"
+)
+
+const (
+	SID = "***"
+	PWD = "***"
 )
 
 func TestClient_AuthUser(t *testing.T) {
@@ -17,14 +22,13 @@ func TestClient_AuthUser(t *testing.T) {
 	tests := []struct {
 		name                 string
 		fields               fields
-		wantAuthUserRespBody *qzapi.AuthUserRespBody
+		wantAuthUserRespBody *qzgo.AuthUserRespBody
 		wantErr              bool
 	}{
 		{
 			name: "test",
 			fields: fields{
-				Student:       *models.NewStudent("201810000431", "hd270516", "sf"),
-				token:         "",
+				Student:       *models.NewStudent(SID, PWD, "sf"),
 				CurrentXnxqId: "",
 				CurrentWeek:   "",
 				Courses:       nil,
@@ -34,21 +38,15 @@ func TestClient_AuthUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				Student:       tt.fields.Student,
-				token:         tt.fields.token,
-				CurrentXnxqId: tt.fields.CurrentXnxqId,
-				CurrentWeek:   tt.fields.CurrentWeek,
-				Courses:       tt.fields.Courses,
-			}
-			gotAuthUserRespBody, err := c.AuthUser()
+			c := New(tt.fields.Student)
+			gotAuthUserRespBody, err := c.Login()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AuthUser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Login() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			t.Log(gotAuthUserRespBody)
 			//if !reflect.DeepEqual(gotAuthUserRespBody, tt.wantAuthUserRespBody) {
-			//	t.Errorf("AuthUser() gotAuthUserRespBody = %v, want %v", gotAuthUserRespBody, tt.wantAuthUserRespBody)
+			//	t.Errorf("Login() gotAuthUserRespBody = %v, want %v", gotAuthUserRespBody, tt.wantAuthUserRespBody)
 			//}
 		})
 	}
@@ -74,8 +72,7 @@ func TestClient_FetchAllTermCourses(t *testing.T) {
 		{
 			name: "test",
 			fields: fields{
-				Student:       *models.NewStudent("201810000431", "hd270516", "sf"),
-				token:         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODMxNTQwNTksImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.2W8rqPpRGfB95-pFODhCzIi9Z1iCgygC2x1Palk6EE8",
+				Student:       *models.NewStudent(SID, PWD, "sf"),
 				CurrentXnxqId: "2019-2020-2",
 				CurrentWeek:   "2",
 				Courses:       nil,
@@ -87,13 +84,8 @@ func TestClient_FetchAllTermCourses(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				Student:       tt.fields.Student,
-				token:         tt.fields.token,
-				CurrentXnxqId: tt.fields.CurrentXnxqId,
-				CurrentWeek:   tt.fields.CurrentWeek,
-				Courses:       tt.fields.Courses,
-			}
+			c := New(tt.fields.Student)
+			c.Login()
 
 			ch := make(chan []models.Course)
 			go c.FetchAllTermCourses(ch)
@@ -119,8 +111,7 @@ func TestClient_FetchCurrentTime(t *testing.T) {
 		{
 			name: "test",
 			fields: fields{
-				Student:       *models.NewStudent("201810000431", "hd270516", "sf"),
-				token:         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODI3ODg3NTYsImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.VJPPqTSTZpBbHVEhjy__uWYwzIfF-sQwv7r0vQJ5ndk",
+				Student:       *models.NewStudent(SID, PWD, "sf"),
 				CurrentXnxqId: "",
 				CurrentWeek:   "",
 				Courses:       nil,
@@ -130,13 +121,8 @@ func TestClient_FetchCurrentTime(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				Student:       tt.fields.Student,
-				token:         tt.fields.token,
-				CurrentXnxqId: tt.fields.CurrentXnxqId,
-				CurrentWeek:   tt.fields.CurrentWeek,
-				Courses:       tt.fields.Courses,
-			}
+			c := New(tt.fields.Student)
+			c.Login()
 			if err := c.FetchCurrentTime(); (err != nil) != tt.wantErr {
 				t.Errorf("FetchCurrentTime() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -165,8 +151,7 @@ func TestClient_FetchWeekCoursesSlowly(t *testing.T) {
 		{
 			name: "test",
 			fields: fields{
-				Student:       *models.NewStudent("201810000431", "hd270516", "sf"),
-				token:         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODI4NTg0ODIsImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.Ry1xwipdj23ryJYeM1utwU6E4GsIszONe0iYsWqDX4Y",
+				Student:       *models.NewStudent(SID, PWD, "sf"),
 				CurrentXnxqId: "2019-2020-2",
 				CurrentWeek:   "2",
 				Courses:       nil,
@@ -179,13 +164,11 @@ func TestClient_FetchWeekCoursesSlowly(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				Student:       tt.fields.Student,
-				token:         tt.fields.token,
-				CurrentXnxqId: tt.fields.CurrentXnxqId,
-				CurrentWeek:   tt.fields.CurrentWeek,
-				Courses:       tt.fields.Courses,
-			}
+			c := New(tt.fields.Student)
+			c.CurrentXnxqId = tt.fields.CurrentXnxqId
+			c.CurrentWeek = tt.fields.CurrentWeek
+			c.Courses = tt.fields.Courses
+			c.Login()
 			ch := make(chan []models.Course)
 			go c.FetchWeekCoursesSlowly(2, ch)
 			t.Log(<-ch)
@@ -235,7 +218,7 @@ func TestNewClient(t *testing.T) {
 	}{
 		{
 			name: "new client",
-			args: args{student: *models.NewStudent("20100000000", "1231", "sdfds")},
+			args: args{student: *models.NewStudent("20100000000", PWD, "sdfds")},
 		},
 	}
 	for _, tt := range tests {
@@ -269,25 +252,23 @@ func TestClient_Save(t *testing.T) {
 		{
 			name: "test",
 			fields: fields{
-				Student:       *models.NewStudent("201810000431", "hd270516", "sf"),
-				token:         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODI4NzE5MjYsImF1ZCI6IjIwMTgxMDAwMDQzMSJ9.QiQvz1Gu-iq2FohEbWxobjsJKGVqgFCwHZ5Bz53lPZM",
+				Student:       *models.NewStudent(SID, PWD, "sf"),
 				CurrentXnxqId: "2019-2020-2",
 				CurrentWeek:   "2",
 				Courses:       nil,
 			},
-			args:args{databaseSource:"c:000123@/test?charset=utf8"},
+			args:             args{databaseSource: "c:000123@/test?charset=utf8"},
 			wantRowsAffected: int64(15),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				Student:       tt.fields.Student,
-				token:         tt.fields.token,
-				CurrentXnxqId: tt.fields.CurrentXnxqId,
-				CurrentWeek:   tt.fields.CurrentWeek,
-				Courses:       tt.fields.Courses,
-			}
+			c := New(tt.fields.Student)
+			c.CurrentXnxqId = tt.fields.CurrentXnxqId
+			c.CurrentWeek = tt.fields.CurrentWeek
+			c.Courses = tt.fields.Courses
+			c.Login()
+
 			ch := make(chan []models.Course)
 			go c.FetchAllTermCourses(ch)
 			t.Log("len(<-ch)", len(<-ch))

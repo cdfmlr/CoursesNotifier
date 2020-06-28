@@ -29,7 +29,7 @@ type CoursesSubscribeSession struct {
 	reqUser    string
 	reqContent string
 
-	qzClient     *qzclient.Client
+	qzClient *qzclient.Client
 }
 
 func NewCoursesSubscribeSession(reqUser string, reqContent string, databaseSource string) *CoursesSubscribeSession {
@@ -50,7 +50,7 @@ func (s *CoursesSubscribeSession) Verify() string {
 	student := models.NewStudent(sid, pwd, s.reqUser)
 
 	s.qzClient = qzclient.New(*student)
-	authRespBody, err := s.qzClient.AuthUser()
+	authRespBody, err := s.qzClient.Login()
 	realName, school := authRespBody.UserRealName, authRespBody.UserDwmc // 姓名、院系
 
 	if err != nil {

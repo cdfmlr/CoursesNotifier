@@ -78,41 +78,41 @@ func New(configFilePath string) *App {
 
 // Test 测试配置完整性、正确行, 若配置完整、可用，则返回 nil，否则返回错误 error
 func (app *App) Test() error {
-	errs := make([]*ConfingMissing, 0)
+	errs := make([]*ConfigMissing, 0)
 	// fmt.Println(app)
 	if app.conf.Ticker.PeriodMinute == int(0) {
-		errs = append(errs, NewConfingMissing("Ticker.PeriodMinute"))
+		errs = append(errs, NewConfigMissing("Ticker.PeriodMinute"))
 	}
 	if strings.TrimSpace(app.conf.Ticker.TimeToStart) == "" {
-		errs = append(errs, NewConfingMissing("Ticker.TimeToStart"))
+		errs = append(errs, NewConfigMissing("Ticker.TimeToStart"))
 	}
 	if app.conf.Ticker.MinuteBeforeCourseToNotify == float64(0) {
-		errs = append(errs, NewConfingMissing("Ticker.MinuteBeforeCourseToNotify"))
+		errs = append(errs, NewConfigMissing("Ticker.MinuteBeforeCourseToNotify"))
 	}
 	if strings.TrimSpace(app.conf.Wx.AppID) == "" {
-		errs = append(errs, NewConfingMissing("Wx.AppID"))
+		errs = append(errs, NewConfigMissing("Wx.AppID"))
 	}
 	if strings.TrimSpace(app.conf.Wx.AppSecret) == "" {
-		errs = append(errs, NewConfingMissing("Wx.AppSecret"))
+		errs = append(errs, NewConfigMissing("Wx.AppSecret"))
 	}
 	if strings.TrimSpace(app.conf.Wx.CourseNoticeTemplateID) == "" {
-		errs = append(errs, NewConfingMissing("Wx.CourseNoticeTemplateID"))
+		errs = append(errs, NewConfigMissing("Wx.CourseNoticeTemplateID"))
 	}
 	if strings.TrimSpace(app.conf.Wx.ReqToken) == "" {
-		errs = append(errs, NewConfingMissing("Wx.ReqToken"))
+		errs = append(errs, NewConfigMissing("Wx.ReqToken"))
 	}
 	if strings.TrimSpace(app.conf.Data.Database) == "" {
-		errs = append(errs, NewConfingMissing("Data.Database"))
+		errs = append(errs, NewConfigMissing("Data.Database"))
 	}
 	if strings.TrimSpace(app.conf.Data.BullshitDataFile) == "" {
-		errs = append(errs, NewConfingMissing("Data.BullshitDataFile"))
+		errs = append(errs, NewConfigMissing("Data.BullshitDataFile"))
 	}
 	if len(errs) != 0 {
 		s := ""
 		for _, e := range errs {
 			s += e.miss + ", "
 		}
-		return *NewConfingMissing(strings.Trim(s, ", "))
+		return *NewConfigMissing(strings.Trim(s, ", "))
 	}
 	return nil
 }
@@ -169,15 +169,15 @@ func (app *App) runCourseTicker() {
 	app.runtime.pCoursesTicker.Start(timeToStart)
 }
 
-type ConfingMissing struct {
+type ConfigMissing struct {
 	miss string
 }
 
-func NewConfingMissing(miss string) *ConfingMissing {
-	return &ConfingMissing{miss: miss}
+func NewConfigMissing(miss string) *ConfigMissing {
+	return &ConfigMissing{miss: miss}
 }
 
-func (c ConfingMissing) Error() string {
+func (c ConfigMissing) Error() string {
 	s := "Config missing: " + c.miss
 	// fmt.Println(s)
 	return s

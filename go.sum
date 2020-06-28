@@ -1,2 +1,4 @@
+github.com/cdfmlr/qzgo v0.0.0-20200628053445-7e1444e419a3 h1:+7QwgVPtf3NzB+M5lXL+5wAoucVbOkjXongUNKjmju8=
+github.com/cdfmlr/qzgo v0.0.0-20200628053445-7e1444e419a3/go.mod h1:E6mCm2TvDromDQ6NGsJYGt/MfhgPf+kW5I+DjvSFkLk=
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=

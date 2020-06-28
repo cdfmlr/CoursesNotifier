@@ -19,8 +19,8 @@ package courseTicker
 import (
 	"example.com/CoursesNotifier/data"
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qz/qzapi"
 	"fmt"
+	"github.com/cdfmlr/qzgo"
 	"log"
 	"math"
 	"regexp"
@@ -39,7 +39,7 @@ func (ct *CoursesTicker) NotifyApproachingCourses() {
 	// 今天第几周
 	currentWeek := getCurrentWeek(ct.databaseSource)
 	// 今天星期几
-	todayQzWeekday := qzapi.TimeWeekToQzWeekday(time.Now().Weekday())
+	todayQzWeekday := qzgo.TimeWeekToQzWeekday(time.Now().Weekday())
 
 	// 最近一个可能上课的时间
 	nearCourseTime := getNearestBeginTime(ct.databaseSource)

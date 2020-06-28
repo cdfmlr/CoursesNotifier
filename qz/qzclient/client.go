@@ -19,16 +19,18 @@ package qzclient
 import (
 	"example.com/CoursesNotifier/data"
 	"example.com/CoursesNotifier/models"
-	"example.com/CoursesNotifier/qz/qzapi"
+	"github.com/cdfmlr/qzgo"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
 )
 
+const SCHOOL = "ncepu"
+
 type Client struct {
+	qzgo.Client
 	Student       models.Student
-	token         string
 	CurrentXnxqId string
 	CurrentWeek   string
 	Courses       map[string]models.Course
@@ -38,23 +40,28 @@ func New(student models.Student) *Client {
 	if student.Sid == "" {
 		log.Fatal("student.Sid should not be Empty!")
 	}
-	return &Client{Student: student}
+
+	client := &Client{Student: student}
+	client.School = SCHOOL
+	client.Xh = client.Student.Sid
+	client.Pwd = client.Student.Pwd
+
+	return client
 }
 
-// AuthUser 登录强智系统，获取操作 token，在该 token 过期之前可以做其他操作
-func (c *Client) AuthUser() (authUserRespBody *qzapi.AuthUserRespBody, err error) {
-	authUserRespBody, err = qzapi.AuthUser(qzapi.SchoolNcepu, c.Student.Sid, c.Student.Pwd)
+// Login 登录强智系统，获取操作 token，在该 token 过期之前可以做其他操作
+func (c *Client) Login() (authUserRespBody *qzgo.AuthUserRespBody, err error) {
+	authUserRespBody, err = c.AuthUser()
 	if err != nil {
 		log.Println(err)
 	}
-	c.token = authUserRespBody.Token
 	return authUserRespBody, err
 }
 
 // FetchCurrentTime 获取当前学期、周次
 func (c *Client) FetchCurrentTime() error {
 	current := time.Now().Format("2006-01-02")
-	getCurrentTimeRespBody, err := qzapi.GetCurrentTime(qzapi.SchoolNcepu, c.token, current)
+	getCurrentTimeRespBody, err := c.GetCurrentTime(current)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -101,7 +108,7 @@ LOOP:
 // FetchWeekCoursesSlowly 获取某一周的课程（要反爬虫，速度很慢）
 func (c *Client) FetchWeekCoursesSlowly(week int, ch chan []models.Course) {
 	time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-	getKbcxAzcRespBodyItems, err := qzapi.GetKbcxAzc(qzapi.SchoolNcepu, c.token, c.Student.Sid, c.CurrentXnxqId, strconv.Itoa(week))
+	getKbcxAzcRespBodyItems, err := c.GetKbcxAzc(c.Student.Sid, c.CurrentXnxqId, strconv.Itoa(week))
 	if err != nil {
 		log.Println(err)
 	}
