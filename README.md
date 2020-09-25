@@ -1,5 +1,7 @@
 # CoursesNotifier for NCEPU(Baoding)
 
+【📢 2020.09.25】目前正在筹划彻底重构升级该项目，欢迎持续关注。
+
 > A courses Notifier for NCEPU(Baoding) based on [WeChat Official Accounts Platform](https://developers.weixin.qq.com/doc/offiaccount/en/Getting_Started/Overview.html).
 >
 > Designed for learning elementary Golang and SQL primer, this project is beginners friendly.
@@ -64,7 +66,7 @@
 
 目前，我使用一个微信测试公众号部署了该服务。（由于开发未完成，不保障服务有效及信息安全）
 
-欢迎关注，预览试用：
+欢迎关注，预览试用（==该服务暂不可用==）：
 
 ![微信测试公众号](https://tva1.sinaimg.cn/large/00831rSTgy1gcghbukj3gj30ci0a0dh1.jpg)
 
