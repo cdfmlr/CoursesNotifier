@@ -7,7 +7,7 @@ import (
 )
 
 func TestCoursesUnsubscribeSession(t *testing.T) {
-	s := NewCoursesUnsubscribeSession("hahaha", "退订", "c:000123@/test?charset=utf8")
+	s := NewCoursesUnsubscribeSession("hahaha", "退订", "c:***@/test?charset=utf8")
 
 	ss := s.Continue("2333")
 	fmt.Println(ss)
