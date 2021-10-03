@@ -6,6 +6,13 @@
 
 【📢 2021.03.19】这个学期，学校改了一下教务系统，获取课表的 API 炸了，这个项目也就基本不能用了。（我感觉是我们学校乱要求人家改的，其他强智教务系统应该是不影响的, see [#拓展开发](#拓展开发)）
 
+【📢 2021.10.03】这个学期好像又能用了吧。
+
+一些相关的一些项目：
+
+- https://github.com/cdfmlr/coursesical ：爬取学校教务系统，获取课表，做成 iCalendar 文件 (.ics)，导入到系统日历 app。
+- https://github.com/cdfmlr/examresult ： 考试出成绩提醒系统。
+
 > A courses Notifier for NCEPU(Baoding) based on [WeChat Official Accounts Platform](https://developers.weixin.qq.com/doc/offiaccount/en/Getting_Started/Overview.html).
 >
 > Designed for learning elementary Golang and SQL primer, this project is beginners friendly.
